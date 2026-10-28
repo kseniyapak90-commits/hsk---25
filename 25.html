@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>xinwaychinese · 双面闪卡 (航海/风险/测量词汇)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #f1ebe5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Times New Roman', Times, serif;
+            padding: 12px;
+        }
+        .card-frame {
+            width: 100%;
+            max-width: 700px;
+            background-color: #fdf8f2;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05);
+            padding: 24px 20px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #e6d5b8;
+        }
+        .header-icon {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin-bottom: 16px; width: 100%;
+        }
+        .icon-badge {
+            background: #ffb347;
+            border-radius: 60px;
+            padding: 8px 18px 8px 15px;
+            display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 6px 0 #c15a1c;
+            border: 2px solid #a04500;
+        }
+        .icon-badge span { font-size: 2.2rem; line-height: 1; filter: drop-shadow(2px 2px 0 #f28500); }
+        .icon-badge h1 {
+            font-size: 1.9rem;
+            font-family: '楷体', 'KaiTi', '华文楷体', 'STKaiti', serif;
+            color: #2d1b0c; letter-spacing: 3px; font-weight: 600;
+            margin-right: 5px; text-shadow: 1px 1px 0 #fce5b1;
+        }
+        .blackboard-area {
+            width: 100%; flex: 2 1 auto;
+            min-height: 380px; max-height: 60vh;
+            aspect-ratio: 4/3; margin: 10px 0 20px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .flip-container {
+            width: 100%; height: 100%; min-height: 300px;
+            background-color: transparent;
+            perspective: 2000px; cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 20px 0 #3a4a3f, 0 25px 30px -5px rgba(0,0,0,0.4);
+        }
+        .flip-inner {
+            position: relative; width: 100%; height: 100%;
+            text-align: center; transition: transform 0.5s;
+            transform-style: preserve-3d; border-radius: 30px;
+        }
+        .flip-inner.flipped { transform: rotateY(180deg); }
+        .front, .back {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            background: #2b4b3a;
+            background-image: radial-gradient(circle at 10px 10px, #3f6b4f 2px, transparent 2px),
+                              radial-gradient(circle at 30px 25px, #3f6b4f 2px, transparent 2px);
+            background-size: 60px 60px, 120px 120px;
+            border: 12px solid #6f4f2e;
+            border-radius: 40px;
+            box-shadow: inset 0 -5px 0 #3d5a3d, inset 0 5px 10px rgba(255,255,240,0.3), 0 10px 0 #4d3e2b;
+            padding: 25px 20px 20px;
+            display: flex; flex-direction: column;
+            color: #f5f2da;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            overflow-y: auto;
+        }
+        .back { transform: rotateY(180deg); }
+        .xinway-tag {
+            position: absolute; top: 12px; left: 18px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.4rem; font-weight: 600;
+            color: #f9e0a0; text-shadow: 2px 2px 0 #3a5e3a;
+            letter-spacing: 1px; z-index: 10;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 8px 2px 6px; border-radius: 40px;
+            backdrop-filter: blur(1px);
+            border: 1px dashed #e8c37b; opacity: 0.95;
+            pointer-events: none;
+        }
+        .word-area {
+            flex: 2; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            margin-top: 25px;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            pointer-events: none;
+        }
+        .chinese-word {
+            font-size: 7vw; font-weight: 700; line-height: 1.2;
+            margin-bottom: 0.2rem;
+            text-shadow: 4px 4px 0 #1f3a27;
+            color: #fff9e0; word-break: break-word; max-width: 90%;
+        }
+        .example-sentence {
+            font-size: 3.8vw;
+            font-family: '楷体', 'KaiTi', 'STKaiti', serif;
+            background: rgba(255,250,210,0.15);
+            padding: 10px 14px; border-radius: 60px;
+            border-left: 5px solid #ffd966;
+            color: #fef9d7; margin: 8px 0 5px;
+            max-width: 95%; word-break: break-word;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        .back-content {
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100%; width: 100%;
+            font-family: 'Times New Roman', Times, serif;
+            margin-top: 25px; gap: 0.6rem;
+            color: #f5f0cf; pointer-events: none;
+        }
+        .pinyin {
+            font-size: 5vw; font-weight: 600;
+            font-family: 'Times New Roman', Times, serif;
+            background: #3b5e4b; padding: 5px 20px;
+            border-radius: 50px; border: 2px solid #c9ae74;
+            width: fit-content;
+        }
+        .pos {
+            font-size: 4.2vw;
+            font-family: 'Times New Roman', Times, serif;
+            background: #637a54; padding: 6px 22px;
+            border-radius: 40px; color: #fef7cd; font-weight: 500;
+        }
+        .russian {
+            font-size: 4vw;
+            font-family: 'Times New Roman', Times, serif;
+            background: #2a4230; padding: 10px 20px;
+            border-radius: 50px; border: 2px dashed #f1cf8a;
+            max-width: 95%; word-break: break-word;
+        }
+        .button-bar {
+            width: 100%; display: flex; justify-content: center;
+            align-items: center; gap: 25px; margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: #f3d9a4; border: 4px solid #ba8b4a;
+            color: #3d2b13; font-size: 1.7rem; font-weight: bold;
+            padding: 12px 35px; border-radius: 60px;
+            box-shadow: 0 7px 0 #7b5a38; cursor: pointer;
+            transition: all 0.06s linear;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: 2px; min-width: 140px; text-align: center;
+        }
+        .action-btn:active { transform: translateY(5px); box-shadow: 0 2px 0 #7b5a38; }
+        .action-btn:disabled { opacity: 0.4; transform: translateY(3px); box-shadow: 0 4px 0 #7b5a38; pointer-events: none; }
+        .small-btn { font-size: 1.5rem; padding: 8px 20px; min-width: 110px; }
+        .nav-btn { background: #b6d7a8; border-color: #3f7842; box-shadow: 0 6px 0 #2a5e2a; color: #1f3f1f; }
+        .hidden { display: none !important; }
+        .success-message {
+            width: 100%; height: 100%;
+            background: #2b4b3a; border-radius: 40px;
+            border: 12px solid #6f4f2e;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; color: #ffd966;
+            font-family: '楷体', 'KaiTi', serif;
+            box-shadow: inset 0 0 30px #c9ae74, 0 15px 0 #4d3e2b;
+        }
+        .success-message span {
+            font-size: 5vw; font-weight: bold;
+            background: #5f4230; padding: 10px 35px;
+            border-radius: 60px; border: 4px solid #f9cb7b;
+        }
+        @media (max-width: 500px) {
+            .chinese-word { font-size: 14vw; }
+            .example-sentence { font-size: 5vw; }
+            .pinyin { font-size: 6vw; }
+            .pos { font-size: 5.5vw; }
+            .russian { font-size: 5vw; }
+            .action-btn { font-size: 1.4rem; padding: 10px 15px; min-width: 110px; }
+            .xinway-tag { font-size: 1.1rem; top: 6px; left: 10px; }
+            .blackboard-area { min-height: 320px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card-frame">
+    <div class="header-icon">
+        <div class="icon-badge">
+            <span>🌊⚓</span>
+            <h1>词语练习</h1>
+        </div>
+    </div>
+
+    <div class="blackboard-area" id="blackboardArea">
+        <div id="flashcardContainer" style="width:100%;height:100%;">
+            <div class="flip-container" id="flipContainer">
+                <div class="flip-inner" id="flipInner">
+                    <div class="front" id="cardFront">
+                        <span class="xinway-tag">xinwaychinese</span>
+                        <div class="word-area" id="frontContent">
+                            <div class="chinese-word" id="wordDisplay"></div>
+                            <div class="example-sentence" id="sentenceDisplay"></div>
+                        </div>
+                    </div>
+                    <div class="back" id="cardBack">
+                        <span class="xinway-tag">xinwaychinese</span>
+                        <div class="back-content" id="backContent">
+                            <div class="pinyin" id="pinyinDisplay"></div>
+                            <div class="pos" id="posDisplay"></div>
+                            <div class="russian" id="ruDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="successScreen" class="success-message hidden">
+            <span>🎉 挑战成功 🎉</span>
+            <button class="action-btn small-btn" id="restartFromSuccess">重新开始</button>
+        </div>
+    </div>
+
+    <div class="button-bar" id="buttonBar">
+        <button class="action-btn" id="startBtn">开始</button>
+        <button class="action-btn nav-btn hidden" id="prevBtn">◀ 上一个</button>
+        <button class="action-btn nav-btn hidden" id="nextBtn">下一个 ▶</button>
+        <button class="action-btn small-btn hidden" id="restartBtn">重新开始</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    const isApple = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent);
+    if (isApple) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initApp);
+        else initApp();
+    } else initApp();
+
+    function initApp(){
+        const cards = [
+            { word:"返航", pinyin:"fǎnháng", pos:"(v.)", ru:"совершать обратный рейс, возвращаться", ex:"船开始返航了。" },
+            { word:"恶劣", pinyin:"èliè", pos:"(adj.)", ru:"плохой, скверный", ex:"天气非常恶劣。" },
+            { word:"可怕", pinyin:"kěpà", pos:"(adj.)", ru:"ужасный, страшный", ex:"这是一个可怕的故事。" },
+            { word:"风浪", pinyin:"fēnglàng", pos:"(n.)", ru:"шторм, бурные волны", ex:"海上风浪很大。" },
+            { word:"慌张", pinyin:"huāngzhāng", pos:"(adj.)", ru:"растерянный, взволнованный", ex:"他看起来很慌张。" },
+            { word:"舱", pinyin:"cāng", pos:"(n.)", ru:"каюта, салон", ex:"请回到客舱。" },
+            { word:"使劲儿", pinyin:"shǐ jìnr", pos:"(v.)", ru:"напрягаться, прилагать усилия", ex:"他使劲儿推门。" },
+            { word:"朝", pinyin:"cháo", pos:"(prep.)", ru:"по направлению к", ex:"朝前面走。" },
+            { word:"简直", pinyin:"jiǎnzhí", pos:"(adv.)", ru:"просто, буквально", ex:"简直不敢相信。" },
+            { word:"沉", pinyin:"chén", pos:"(v.)", ru:"тонуть, опускаться", ex:"船慢慢沉了。" },
+            { word:"严肃", pinyin:"yánsù", pos:"(adj.)", ru:"серьёзный, торжественный", ex:"他的表情很严肃。" },
+            { word:"猛烈", pinyin:"měngliè", pos:"(adj.)", ru:"сильный, яростный, свирепый", ex:"风猛烈地吹。" },
+            { word:"狂", pinyin:"kuáng", pos:"(adj.)", ru:"безумный, необузданный", ex:"狂风大雨。" },
+            { word:"威胁", pinyin:"wēixié", pos:"(v.)", ru:"угрожать", ex:"风暴威胁着船只。" },
+            { word:"平衡", pinyin:"pínghéng", pos:"(adj.)", ru:"сбалансированный", ex:"保持平衡。" },
+            { word:"吨", pinyin:"dūn", pos:"(m.)", ru:"метрическая тонна", ex:"这艘船有十吨重。" },
+            { word:"钢铁", pinyin:"gāngtiě", pos:"(n.)", ru:"сталь", ex:"钢铁很坚硬。" },
+            { word:"根基", pinyin:"gēnjī", pos:"(n.)", ru:"основа, фундамент", ex:"打好根基很重要。" },
+            { word:"重量", pinyin:"zhòngliàng", pos:"(n.)", ru:"вес", ex:"重量是多少？" },
+            { word:"相似", pinyin:"xiāngsì", pos:"(adj.)", ru:"похожий", ex:"这两个很像相似。" },
+            { word:"风景", pinyin:"fēngjǐng", pos:"(n.)", ru:"пейзаж, вид", ex:"这里风景很美。" },
+            { word:"窄", pinyin:"zhǎi", pos:"(adj.)", ru:"узкий", ex:"这条路很窄。" },
+            { word:"万丈", pinyin:"wànzhàng", pos:"(num.-m.)", ru:"огромный, бездонный", ex:"万丈深渊。" },
+            { word:"深渊", pinyin:"shēnyuān", pos:"(n.)", ru:"пропасть, бездонная пучина", ex:"下面是深渊。" },
+            { word:"游览", pinyin:"yóulǎn", pos:"(v.)", ru:"посещать, осматривать достопримечательности", ex:"我们游览了长城。" },
+            { word:"发抖", pinyin:"fādǒu", pos:"(v.)", ru:"дрожать, трястись", ex:"他冷得发抖。" },
+            { word:"负重", pinyin:"fùzhòng", pos:"(v.)", ru:"нести груз или тяжесть", ex:"负重前行。" },
+            { word:"摔倒", pinyin:"shuāidǎo", pos:"(v.)", ru:"падать, спотыкаться", ex:"他不小心摔倒了。" },
+            { word:"妇女", pinyin:"fùnǚ", pos:"(n.)", ru:"женщина", ex:"妇女节快乐。" },
+            { word:"起", pinyin:"qǐ", pos:"(m.)", ru:"случай, инцидент", ex:"一起事故。" },
+            { word:"丝毫", pinyin:"sīháo", pos:"(adj.)", ru:"малейший, нисколько", ex:"丝毫没有犹豫。" },
+            { word:"滚", pinyin:"gǔn", pos:"(v.)", ru:"катить(ся), кувыркаться", ex:"球滚走了。" },
+            { word:"风险", pinyin:"fēngxiǎn", pos:"(n.)", ru:"риск", ex:"投资有风险。" },
+            { word:"谨慎", pinyin:"jǐnshèn", pos:"(adj.)", ru:"осторожный, осмотрительный", ex:"做事要谨慎。" },
+            { word:"效应", pinyin:"xiàoyìng", pos:"(n.)", ru:"эффект", ex:"产生了良好的效应。" },
+            { word:"胸", pinyin:"xiōng", pos:"(n.)", ru:"грудь, бюст", ex:"挺起胸来。" },
+            { word:"承受", pinyin:"chéngshòu", pos:"(v.)", ru:"выносить, терпеть", ex:"他承受了很大的压力。" },
+            { word:"和尚", pinyin:"héshang", pos:"(n.)", ru:"буддийский монах", ex:"寺庙里有一位和尚。" },
+            { word:"钟", pinyin:"zhōng", pos:"(n.)", ru:"колокол, часы", ex:"钟声响了。" },
+            { word:"彻底", pinyin:"chèdǐ", pos:"(adj.)", ru:"основательный, полный", ex:"彻底解决问题。" },
+            { word:"厘米", pinyin:"límǐ", pos:"(n.)", ru:"сантиметр", ex:"长十厘米。" },
+            { word:"克", pinyin:"kè", pos:"(m.)", ru:"грамм", ex:"一百克糖。" },
+            { word:"平方", pinyin:"píngfāng", pos:"(adj.)", ru:"квадратный (о площади)", ex:"二十平方米。" },
+            { word:"尺子", pinyin:"chǐzi", pos:"(n.)", ru:"линейка", ex:"借一下尺子。" },
+            { word:"胶水", pinyin:"jiāoshuǐ", pos:"(n.)", ru:"клей", ex:"用胶水粘上。" },
+            { word:"文具", pinyin:"wénjù", pos:"(n.)", ru:"канцелярские товары", ex:"买一些文具。" }
+        ];
+
+        const startBtn=document.getElementById('startBtn');
+        const prevBtn=document.getElementById('prevBtn');
+        const nextBtn=document.getElementById('nextBtn');
+        const restartBtn=document.getElementById('restartBtn');
+        const restartFromSuccess=document.getElementById('restartFromSuccess');
+        const flipContainer=document.getElementById('flipContainer');
+        const flipInner=document.getElementById('flipInner');
+        const flashcardContainer=document.getElementById('flashcardContainer');
+        const successScreen=document.getElementById('successScreen');
+        const wordDisplay=document.getElementById('wordDisplay');
+        const sentenceDisplay=document.getElementById('sentenceDisplay');
+        const pinyinDisplay=document.getElementById('pinyinDisplay');
+        const posDisplay=document.getElementById('posDisplay');
+        const ruDisplay=document.getElementById('ruDisplay');
+
+        let currentIndex=0, gameActive=false;
+
+        function updateCardContent(){
+            if(currentIndex>=0&&currentIndex<cards.length){
+                const c=cards[currentIndex];
+                wordDisplay.textContent=c.word;
+                sentenceDisplay.textContent=c.ex;
+                pinyinDisplay.textContent=c.pinyin;
+                posDisplay.textContent=c.pos;
+                ruDisplay.textContent=c.ru;
+            }
+        }
+        function resetFlip(){ flipInner.classList.remove('flipped'); }
+        function showScreenByIndex(){
+            if(currentIndex>=cards.length){
+                flashcardContainer.classList.add('hidden');
+                successScreen.classList.remove('hidden');
+                restartBtn.classList.remove('hidden');
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+                startBtn.classList.add('hidden');
+            }else{
+                flashcardContainer.classList.remove('hidden');
+                successScreen.classList.add('hidden');
+                updateCardContent();
+                resetFlip();
+                if(gameActive){
+                    startBtn.classList.add('hidden');
+                    prevBtn.classList.remove('hidden');
+                    nextBtn.classList.remove('hidden');
+                    restartBtn.classList.remove('hidden');
+                }else{
+                    startBtn.classList.remove('hidden');
+                    prevBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    restartBtn.classList.add('hidden');
+                }
+            }
+        }
+        function startGame(){ gameActive=true; if(currentIndex>=cards.length)currentIndex=0; showScreenByIndex(); }
+        function restartGame(){ currentIndex=0; gameActive=true; resetFlip(); showScreenByIndex(); }
+        function goPrev(){ if(!gameActive)return; if(currentIndex>0){currentIndex--;showScreenByIndex();} }
+        function goNext(){ if(!gameActive)return; if(currentIndex<cards.length-1){currentIndex++;showScreenByIndex();} else if(currentIndex===cards.length-1){currentIndex++;showScreenByIndex();} }
+        function handleBlackboardClick(){
+            if(!gameActive||currentIndex>=cards.length)return;
+            flipInner.classList.toggle('flipped');
+        }
+
+        flipContainer.addEventListener('click',handleBlackboardClick);
+        startBtn.addEventListener('click',e=>{e.stopPropagation();startGame();});
+        prevBtn.addEventListener('click',e=>{e.stopPropagation();goPrev();});
+        nextBtn.addEventListener('click',e=>{e.stopPropagation();goNext();});
+        restartBtn.addEventListener('click',e=>{e.stopPropagation();restartGame();});
+        restartFromSuccess.addEventListener('click',e=>{e.stopPropagation();restartGame();});
+
+        currentIndex=0; gameActive=false; showScreenByIndex(); resetFlip();
+    }
+})();
+</script>
+</body>
+</html>
